@@ -45,7 +45,7 @@ function Header() {
           <li><Link to="/catalogo">Catalogo</Link></li>
           <li>Carrito</li>
           <li>Perfil</li>
-          <li>Nosotros</li>
+          <li><Link to="/blog">Blog</Link></li>
           <li>Reseñas</li>
           <li id="cuenta">
             {usuario ? (
