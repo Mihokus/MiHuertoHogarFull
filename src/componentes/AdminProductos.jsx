@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 function AdminProductos() {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const token = localStorage.getItem("token");
 
   const [formCrear, setFormCrear] = useState({
     codigo: "",
@@ -19,14 +20,28 @@ function AdminProductos() {
     categoriaId: ""
   });
 
-
   const [formEditar, setFormEditar] = useState(null);
 
+  // Protección de acceso
   useEffect(() => {
-    axios.get("http://localhost:8081/productos").then(res => setProductos(res.data));
-    axios.get("http://localhost:8081/categorias").then(res => setCategorias(res.data));
-  }, []);
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
+    axios.get("http://localhost:8081/productos", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => setProductos(res.data))
+    .catch(() => navigate("/login"));
+
+    axios.get("http://localhost:8081/categorias", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => setCategorias(res.data))
+    .catch(() => navigate("/login"));
+
+  }, [token, navigate]);
 
 
   const handleCrearInput = (e) => {
@@ -35,6 +50,7 @@ function AdminProductos() {
 
   const handleCrear = async (e) => {
     e.preventDefault();
+
     const response = await axios.post("http://localhost:8081/productos", formCrear, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -54,9 +70,8 @@ function AdminProductos() {
   };
 
 
-
   const seleccionarParaEditar = (producto) => {
-    setFormEditar({ ...producto });
+    setFormEditar(producto);
   };
 
   const handleEditarInput = (e) => {
@@ -64,25 +79,27 @@ function AdminProductos() {
   };
 
   const handleEditar = async () => {
-    const response = await axios.put(`http://localhost:8081/productos/${formEditar.id}`, formEditar, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.put(
+      `http://localhost:8081/productos/${formEditar.id}`,
+      formEditar,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
     setProductos(productos.map(p => p.id === formEditar.id ? response.data : p));
     setFormEditar(null);
   };
 
 
-
   const handleEliminar = async (id) => {
     if (!window.confirm("¿Eliminar producto?")) return;
 
     await axios.delete(`http://localhost:8081/productos/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     setProductos(productos.filter(p => p.id !== id));
   };
+
 
   return (
     <div className="admin-wrapper">
@@ -91,9 +108,11 @@ function AdminProductos() {
       <div className="admin-container">
 
 
+        {/* CREAR PRODUCTO */}
         <div className="admin-card">
           <h2 className="admin-card-title">Agregar Producto</h2>
           <form onSubmit={handleCrear} className="admin-form">
+
             {Object.keys(formCrear).map((key) =>
               key !== "categoriaId" ? (
                 <input
@@ -127,6 +146,8 @@ function AdminProductos() {
         </div>
 
 
+
+        {/* EDITAR PRODUCTO */}
         <div className="admin-card">
           <h2 className="admin-card-title">Editar Producto</h2>
 
@@ -154,6 +175,8 @@ function AdminProductos() {
         </div>
 
 
+
+        {/* ELIMINAR PRODUCTO */}
         <div className="admin-card">
           <h2 className="admin-card-title">Eliminar Producto</h2>
           <ul className="admin-list">
