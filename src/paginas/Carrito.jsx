@@ -9,7 +9,7 @@ function Carrito() {
   const navigate = useNavigate();
   const [mensajeCompra, setMensajeCompra] = useState("");
 
-  const items = carrito.items ?? []; // 🟢 compatible backend o local
+  const items = carrito.items ?? []; 
 
   const total = items.reduce((sum, item) => sum + (item.subtotal ?? item.precio * item.cantidad), 0);
 
@@ -33,7 +33,7 @@ function Carrito() {
 
       {items.length === 0 ? (
         <p style={{ textAlign: "center", fontSize: "18px", marginTop: "20px" }}>
-          {mensajeCompra ? "Gracias por su compra ❤️" : "Tu carrito está vacío 🛒"}
+          {mensajeCompra ? "Gracias por su compra" : "Tu carrito está vacío "}
         </p>
       ) : (
         <>

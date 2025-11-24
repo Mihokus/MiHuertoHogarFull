@@ -8,10 +8,10 @@ function Historial() {
     const cargarHistorial = async () => {
       try {
         const res = await API.get("/carrito/historial");
-        console.log("📦 Historial recibido:", res.data);
+        console.log(" Historial recibido:", res.data);
         setPedidos(res.data);
       } catch (err) {
-        console.error("❌ Error cargando historial:", err);
+        console.error("Error cargando historial:", err);
       }
     };
 

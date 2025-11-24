@@ -22,7 +22,7 @@ function AdminProductos() {
 
   const [formEditar, setFormEditar] = useState(null);
 
-  // Protección de acceso
+
   useEffect(() => {
     if (!token) {
       navigate("/login");

@@ -9,13 +9,13 @@ export const CarritoProvider = ({ children }) => {
   const token = localStorage.getItem("token");
   const usandoBackend = !!token;
 
-  // 🔹 Cargar carrito dependiendo de si está logueado o no
+
   useEffect(() => {
     if (usandoBackend) cargarCarritoServidor();
     else cargarLocalCarrito();
   }, [token]);
 
-  // ⭐ Cargar desde backend
+
   const cargarCarritoServidor = async () => {
     try {
       const res = await API.get("/carrito");
@@ -25,19 +25,19 @@ export const CarritoProvider = ({ children }) => {
     }
   };
 
-  // ⭐ Cargar desde localStorage (si no hay login)
+ 
   const cargarLocalCarrito = () => {
     const guardado = localStorage.getItem("carrito");
     setCarrito(guardado ? JSON.parse(guardado) : { items: [] });
   };
 
-  // ⭐ Guardar cambios en localStorage
+ 
   const syncLocalStorage = (nuevoCarrito) => {
     localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
     setCarrito(nuevoCarrito);
   };
 
-  // ⭐ AGREGAR PRODUCTO (recibe el producto completo)
+ 
   const agregarAlCarrito = async (producto, cantidad = 1) => {
     if (usandoBackend) {
       const res = await API.post("/carrito/items", {
@@ -48,7 +48,7 @@ export const CarritoProvider = ({ children }) => {
       return;
     }
 
-    // 🟢 Modo sin login (localStorage)
+   
     const existe = carrito.items.find((item) => item.id === producto.id);
 
     let nuevo;
@@ -83,7 +83,7 @@ export const CarritoProvider = ({ children }) => {
     syncLocalStorage(nuevo);
   };
 
-  // ⭐ ACTUALIZAR CANTIDAD
+
   const actualizarCantidad = async (productoId, cantidad) => {
     if (usandoBackend) {
       const res = await API.put("/carrito/items", {
@@ -94,7 +94,7 @@ export const CarritoProvider = ({ children }) => {
       return;
     }
 
-    // modo local
+    
     const nuevo = {
       items: carrito.items.map((i) =>
         i.id === productoId
@@ -106,7 +106,7 @@ export const CarritoProvider = ({ children }) => {
     syncLocalStorage(nuevo);
   };
 
-  // ⭐ ELIMINAR ITEM
+
   const eliminarDelCarrito = async (productoId) => {
     if (usandoBackend) {
       const res = await API.delete(`/carrito/items/${productoId}`);
@@ -121,7 +121,7 @@ export const CarritoProvider = ({ children }) => {
     syncLocalStorage(nuevo);
   };
 
-  // ⭐ VACIAR CARRITO
+  
   const vaciarCarrito = async () => {
     if (usandoBackend) {
       const res = await API.delete("/carrito");
@@ -131,7 +131,7 @@ export const CarritoProvider = ({ children }) => {
     syncLocalStorage({ items: [] });
   };
 
-  // ⭐ CHECKOUT (solo con login)
+
   const checkout = async () => {
     if (!token) return false;
     await API.post("/carrito/checkout");
@@ -139,7 +139,7 @@ export const CarritoProvider = ({ children }) => {
     return true;
   };
 
-  // ⭐ CONTADOR (para el ícono 🛒)
+
   const cantidadTotal = carrito.items.reduce(
     (total, item) => total + item.cantidad,
     0
