@@ -8,7 +8,8 @@ function Header() {
   const { usuario, logout } = useContext(UserContext);
   const { carrito } = useContext(CarritoContext);
 
-  const cantidadTotal = carrito.reduce((total, item) => total + item.cantidad, 0);
+  const cantidadTotal =
+    carrito?.items?.reduce((total, item) => total + item.cantidad, 0) || 0;
 
   const esAdmin = usuario?.roles?.some((r) => {
     const valor = typeof r === "string" ? r : r.nombre;
@@ -16,8 +17,8 @@ function Header() {
   });
 
   const handleLogout = () => {
-    logout(); 
-    navigate("/"); 
+    logout();
+    navigate("/");
   };
 
   return (
@@ -29,27 +30,23 @@ function Header() {
           <li><Link className="link" to="/">Inicio</Link></li>
           <li><Link className="link" to="/catalogo">Catálogo</Link></li>
           <li><Link className="link" to="/blog">Blog</Link></li>
+          <li><Link className="link" to="/historial">Mis compras</Link></li>
 
-         
-          <li 
+          <li
             className="carrito-link"
             onClick={() => navigate("/carrito")}
             style={{ cursor: "pointer" }}
           >
-            Carrito <span className="carrito-icono">🛒</span>
-
+            Carrito 🛒{" "}
             {cantidadTotal > 0 && (
               <span className="carrito-badge">{cantidadTotal}</span>
             )}
           </li>
 
-          
           {esAdmin && (
-            <div className="admin-group">
-              <button className="btn-admin" onClick={() => navigate("/admin/productos")}>
-                Admin
-              </button>
-            </div>
+            <button className="btn-admin" onClick={() => navigate("/admin/productos")}>
+              Admin
+            </button>
           )}
 
           <li className="cuenta">
@@ -61,7 +58,9 @@ function Header() {
                 </button>
               </>
             ) : (
-              <button className="btn-login" onClick={() => navigate("/login")}>Iniciar sesión</button>
+              <button className="btn-login" onClick={() => navigate("/login")}>
+                Iniciar sesión
+              </button>
             )}
           </li>
         </ul>

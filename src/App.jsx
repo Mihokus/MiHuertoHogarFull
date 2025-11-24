@@ -11,6 +11,7 @@ import AdminProductos from "./componentes/AdminProductos";
 import { CarritoProvider } from "./context/CarritoContext";
 import Header from "./componentes/Header";
 import { UserProvider } from "./context/UserContext";
+import Historial from "./paginas/Historial";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/producto/:codigo" element={<DetalleProducto />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/carrito" element={<Carrito />} />
+            <Route path="/historial" element={<Historial />} />
 
             <Route
               path="/admin/productos"
