@@ -1,85 +1,48 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useContext } from "react";
 import AuthService from "../services/AuthService";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 function Registro() {
+  const { setUsuario } = useContext(UserContext);
   const navigate = useNavigate();
+
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
 
     try {
-      const response = await AuthService.register(nombre, email, password);
-
-      if (response && response.token) {
-        localStorage.setItem("token", response.token);
-        localStorage.setItem(
-          "usuarioLogueado",
-          JSON.stringify({
-            nombre: response.nombre,
-            email: response.email,
-            roles: response.roles,
-          })
-        );
-
-        setSuccess("¡Registro exitoso! Redirigiendo...");
-        setTimeout(() => navigate("/"), 1000);
-      }
+      const data = await AuthService.register(nombre, email, password);
+      setUsuario(data);
+      navigate("/");   
     } catch (err) {
-      setError("El correo ya está registrado o hubo un error.");
-      console.log(err);
+      setError(err.response?.data?.message || "⚠ Error al registrarse");
     }
   };
 
   return (
     <div id="forms-container">
-      <div id="register-form">
+      <form id="register-form" onSubmit={handleRegister}>
         <h2>Crear Cuenta</h2>
-        <form onSubmit={handleRegister}>
-          <label>Nombre completo</label>
-          <input
-            type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            placeholder="Ingresa tu nombre"
-            required
-          />
 
-          <label>Correo electrónico</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="correo@ejemplo.com"
-            required
-          />
+        <label>Nombre</label>
+        <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
 
-          <label>Contraseña</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
-            required
-          />
+        <label>Correo</label>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
-          {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
-          {success && <p style={{ color: "green", textAlign: "center" }}>{success}</p>}
+        <label>Contraseña</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
-          <button type="submit">Registrarse</button>
-        </form>
+        <button type="submit">Registrarme</button>
 
-        <p style={{ textAlign: "center", marginTop: "15px" }}>
-          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
-        </p>
-      </div>
+        {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+      </form>
     </div>
   );
 }

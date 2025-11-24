@@ -1,53 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
+import { CarritoContext } from "../context/CarritoContext";
 
 function Header() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState(null);
+  const { usuario, logout } = useContext(UserContext);
+  const { carrito } = useContext(CarritoContext);
 
-  useEffect(() => {
-    const usuarioLogueado = localStorage.getItem('usuarioLogueado');
-    if (usuarioLogueado) {
-      setUsuario(JSON.parse(usuarioLogueado));
-    }
-  }, []);
+  const cantidadTotal = carrito.reduce((total, item) => total + item.cantidad, 0);
+
+  const esAdmin = usuario?.roles?.some((r) => {
+    const valor = typeof r === "string" ? r : r.nombre;
+    return valor?.toUpperCase().includes("ADMIN");
+  });
 
   const handleLogout = () => {
-    localStorage.removeItem('usuarioLogueado');
-    localStorage.removeItem('token');
-    setUsuario(null);
-    navigate('/');
+    logout(); 
+    navigate("/"); 
   };
 
-  // Aquí verificamos si el usuario tiene el rol ADMIN o ROLE_ADMIN
-  const esAdmin = usuario?.roles?.some(r => r === 'ADMIN' || r === 'ROLE_ADMIN');
-
   return (
-    <header>
-      <h1>HuertoHogar</h1>
-      <nav>
-        <ul className="menuder">
-          <li><Link to="/">Inicio</Link></li>
-          <li><Link to="/catalogo">Catálogo</Link></li>
-          <li><Link to="/carrito">Carrito</Link></li>
-          <li><Link to="/blog">Blog</Link></li>
+    <header className="header">
+      <h1 className="header-title">HuertoHogar</h1>
 
+      <nav>
+        <ul className="menu">
+          <li><Link className="link" to="/">Inicio</Link></li>
+          <li><Link className="link" to="/catalogo">Catálogo</Link></li>
+          <li><Link className="link" to="/blog">Blog</Link></li>
+
+         
+          <li 
+            className="carrito-link"
+            onClick={() => navigate("/carrito")}
+            style={{ cursor: "pointer" }}
+          >
+            Carrito <span className="carrito-icono">🛒</span>
+
+            {cantidadTotal > 0 && (
+              <span className="carrito-badge">{cantidadTotal}</span>
+            )}
+          </li>
+
+          
           {esAdmin && (
-            <li>
-              <button onClick={() => navigate('/admin/productos')}>
-                Admin Productos
+            <div className="admin-group">
+              <button className="btn-admin" onClick={() => navigate("/admin/productos")}>
+                Admin
               </button>
-            </li>
+            </div>
           )}
 
-          <li id="cuenta">
+          <li className="cuenta">
             {usuario ? (
               <>
-                <span style={{ marginRight: '10px' }}>{usuario.nombre}</span>
-                <button onClick={handleLogout}>Cerrar sesión</button>
+                <span className="username">{usuario.nombre}</span>
+                <button className="btn-logout" onClick={handleLogout}>
+                  Cerrar sesión
+                </button>
               </>
             ) : (
-              <button onClick={() => navigate('/login')}>Iniciar sesión</button>
+              <button className="btn-login" onClick={() => navigate("/login")}>Iniciar sesión</button>
             )}
           </li>
         </ul>

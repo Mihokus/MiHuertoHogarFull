@@ -15,7 +15,6 @@ function Blog() {
   }, []);
   return (
     <>
-      <Header />
       <main>
         <div style={{ padding: '20px 5%' }}>
           <h2 style={{ fontSize: '2.5rem', color: '#38761D', marginBottom: '30px', borderBottom: '3px solid #FFC107', paddingBottom: '10px' }}>

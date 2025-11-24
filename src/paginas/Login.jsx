@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AuthService from "../services/AuthService";
+import { UserContext } from "../context/UserContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(UserContext);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,25 +18,23 @@ function Login() {
     try {
       const response = await AuthService.login(email, password);
 
-      if (response && response.token) {
-        // Guardar token y usuario con roles
-        localStorage.setItem("token", response.token);
-        localStorage.setItem(
-          "usuarioLogueado",
-          JSON.stringify({
+      if (response?.token) {
+        
+        login(
+          {
             nombre: response.nombre,
             email: response.email,
-            roles: response.roles, // roles ahora es lista
-          })
+            roles: response.roles
+          },
+          response.token
         );
 
-        navigate("/"); // redirige al inicio
+        navigate("/");
       } else {
         setError("Credenciales incorrectas.");
       }
     } catch (err) {
       setError("Usuario o contraseña incorrectos.");
-      console.log(err);
     }
   };
 
@@ -47,7 +48,6 @@ function Login() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="correo@ejemplo.com"
             required
           />
 
@@ -56,20 +56,15 @@ function Login() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
             required
           />
 
-          {error && (
-            <p style={{ color: "red", textAlign: "center", marginBottom: "10px" }}>
-              {error}
-            </p>
-          )}
+          {error && <p style={{ color: "red" }}>{error}</p>}
 
           <button type="submit">Entrar</button>
         </form>
 
-        <p style={{ textAlign: "center", marginTop: "15px" }}>
+        <p>
           ¿No tienes cuenta? <Link to="/registro">Regístrate</Link>
         </p>
       </div>

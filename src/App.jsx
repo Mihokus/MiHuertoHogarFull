@@ -5,38 +5,40 @@ import Login from "./paginas/Login";
 import Registro from "./paginas/Registro";
 import Carrito from "./paginas/Carrito";
 import PrivateRoute from "./componentes/PrivateRoute";
-import Inicio from "./paginas/Inicio"
+import Inicio from "./paginas/Inicio";
 import Blog from "./paginas/Blog";
 import AdminProductos from "./componentes/AdminProductos";
-
+import { CarritoProvider } from "./context/CarritoContext";
+import Header from "./componentes/Header";
+import { UserProvider } from "./context/UserContext";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Inicio />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
-        <Route path="/catalogo" element={<Catalogo />} />
-        <Route path="/producto/:codigo" element={<DetalleProducto />} />
-        <Route path="/blog" element={<Blog />} />
+    <CarritoProvider>
+      <UserProvider>
+        <Router>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Inicio />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Registro />} />
+            <Route path="/catalogo" element={<Catalogo />} />
+            <Route path="/producto/:codigo" element={<DetalleProducto />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/carrito" element={<Carrito />} />
 
-
-        <Route path="/carrito" element={
-          <PrivateRoute>
-            <Carrito />
-          </PrivateRoute>} />
-        <Route
-          path="/admin/productos"
-          element={
-            <PrivateRoute requiredRole="ADMIN">
-              <AdminProductos />
-            </PrivateRoute>
-          }
-        />
-
-      </Routes>
-    </Router>
+            <Route
+              path="/admin/productos"
+              element={
+                <PrivateRoute requiredRole="ADMIN">
+                  <AdminProductos />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </UserProvider>
+    </CarritoProvider>
   );
 }
 

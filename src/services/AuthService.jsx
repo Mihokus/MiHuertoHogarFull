@@ -4,43 +4,37 @@ const API_URL = "http://localhost:8081/auth";
 
 class AuthService {
 
-    async login(email, password) {
-        const response = await axios.post(`${API_URL}/login`, { email, password });
-        if (response.data.token) {
-            localStorage.setItem("token", response.data.token);
-        }
+  async login(email, password) {
+    const response = await axios.post(`${API_URL}/login`, { email, password });
 
-        return response.data;
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data)); 
     }
 
-    async register(nombre, email, password) {
-        const response = await axios.post(`${API_URL}/register`, {
-            nombre,
-            email,
-            password
-        });
-        return response.data;
-    }
+    return response.data;
+  }
 
-    logout() {
-        localStorage.removeItem("token");
-    }
+  async register(nombre, email, password) {
+    const response = await axios.post(`${API_URL}/register`, { nombre, email, password });
 
-    getToken() {
-        return localStorage.getItem("token");
-    }
+  
+    return await this.login(email, password);
+  }
 
-    async getCurrentUser() {
-        const token = this.getToken();
+  logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  }
 
-        if (!token) return null;
+  getToken() {
+    return localStorage.getItem("token");
+  }
 
-        const response = await axios.get(`${API_URL}/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-
-        return response.data;
-    }
+  getCurrentUser() {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  }
 }
 
 export default new AuthService();

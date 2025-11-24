@@ -3,102 +3,171 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function AdminProductos() {
+  const navigate = useNavigate();
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [nombre, setNombre] = useState("");
-  const [precio, setPrecio] = useState("");
-  const [categoriaId, setCategoriaId] = useState("");
-  const [mensaje, setMensaje] = useState("");
-  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  const [formCrear, setFormCrear] = useState({
+    codigo: "",
+    nombre: "",
+    precio: "",
+    stock: "",
+    unidad: "",
+    descripcion: "",
+    imagenUrl: "",
+    categoriaId: ""
+  });
+
+
+  const [formEditar, setFormEditar] = useState(null);
+
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"));
-    if (!usuario || !usuario.roles?.includes("ADMIN")) {
-      navigate("/");
-      return;
-    }
+    axios.get("http://localhost:8081/productos").then(res => setProductos(res.data));
+    axios.get("http://localhost:8081/categorias").then(res => setCategorias(res.data));
+  }, []);
 
-    // Traer productos
-    axios.get("http://localhost:8081/productos")
-      .then(res => setProductos(res.data))
-      .catch(err => console.log(err));
 
-    // Traer categorías
-    axios.get("http://localhost:8081/categorias")
-      .then(res => setCategorias(res.data))
-      .catch(err => console.log(err));
-  }, [navigate]);
+
+  const handleCrearInput = (e) => {
+    setFormCrear({ ...formCrear, [e.target.name]: e.target.value });
+  };
 
   const handleCrear = async (e) => {
     e.preventDefault();
-    setMensaje("");
+    const response = await axios.post("http://localhost:8081/productos", formCrear, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    if (!nombre || !precio || !categoriaId) {
-      setMensaje("Completa todos los campos");
-      return;
-    }
+    setProductos([...productos, response.data]);
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8081/productos",
-        { nombre, precio: parseFloat(precio), categoriaId: parseInt(categoriaId) },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setProductos([...productos, response.data]);
-      setMensaje("Producto creado!");
-      setNombre("");
-      setPrecio("");
-      setCategoriaId("");
-    } catch (err) {
-      setMensaje("Error: no tienes permisos o faltan datos");
-      console.log(err);
-    }
+    setFormCrear({
+      codigo: "",
+      nombre: "",
+      precio: "",
+      stock: "",
+      unidad: "",
+      descripcion: "",
+      imagenUrl: "",
+      categoriaId: ""
+    });
+  };
+
+
+
+  const seleccionarParaEditar = (producto) => {
+    setFormEditar({ ...producto });
+  };
+
+  const handleEditarInput = (e) => {
+    setFormEditar({ ...formEditar, [e.target.name]: e.target.value });
+  };
+
+  const handleEditar = async () => {
+    const response = await axios.put(`http://localhost:8081/productos/${formEditar.id}`, formEditar, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setProductos(productos.map(p => p.id === formEditar.id ? response.data : p));
+    setFormEditar(null);
+  };
+
+
+
+  const handleEliminar = async (id) => {
+    if (!window.confirm("¿Eliminar producto?")) return;
+
+    await axios.delete(`http://localhost:8081/productos/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    setProductos(productos.filter(p => p.id !== id));
   };
 
   return (
-    <div id="forms-container">
-      <div id="register-form">
-        <h2>Administrar Productos</h2>
-        <form onSubmit={handleCrear}>
-          <label>Nombre</label>
-          <input
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            placeholder="Nombre del producto"
-          />
+    <div className="admin-wrapper">
+      <h1 className="admin-title">Panel de Productos</h1>
 
-          <label>Precio</label>
-          <input
-            type="number"
-            value={precio}
-            onChange={(e) => setPrecio(e.target.value)}
-            placeholder="Precio"
-          />
+      <div className="admin-container">
 
-          <label>Categoría</label>
-          <select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}>
-            <option value="">Selecciona categoría</option>
-            {categorias.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+
+        <div className="admin-card">
+          <h2 className="admin-card-title">Agregar Producto</h2>
+          <form onSubmit={handleCrear} className="admin-form">
+            {Object.keys(formCrear).map((key) =>
+              key !== "categoriaId" ? (
+                <input
+                  key={key}
+                  name={key}
+                  value={formCrear[key]}
+                  onChange={handleCrearInput}
+                  placeholder={key.toUpperCase()}
+                  className="admin-input"
+                />
+              ) : null
+            )}
+
+            <select
+              name="categoriaId"
+              value={formCrear.categoriaId}
+              onChange={handleCrearInput}
+              className="admin-input"
+              required
+            >
+              <option value="">Seleccionar Categoría</option>
+              {categorias.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
+
+            <button className="btn btn-primary" type="submit">Guardar</button>
+          </form>
+        </div>
+
+
+        <div className="admin-card">
+          <h2 className="admin-card-title">Editar Producto</h2>
+
+          {formEditar === null ? (
+            <ul className="admin-list">
+              {productos.map((p) => (
+                <li key={p.id} className="admin-item">
+                  <span>{p.nombre}</span>
+                  <button className="btn btn-secondary" onClick={() => seleccionarParaEditar(p)}>Editar</button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <>
+              <h3 className="admin-edit-label">Editando: {formEditar.nombre}</h3>
+
+              <input name="nombre" value={formEditar.nombre} onChange={handleEditarInput} className="admin-input" />
+              <input name="precio" value={formEditar.precio} onChange={handleEditarInput} className="admin-input" />
+              <input name="stock" value={formEditar.stock} onChange={handleEditarInput} className="admin-input" />
+
+              <button className="btn btn-primary" onClick={handleEditar}>Actualizar</button>
+              <button className="btn btn-cancel" onClick={() => setFormEditar(null)}>Cancelar</button>
+            </>
+          )}
+        </div>
+
+
+        <div className="admin-card">
+          <h2 className="admin-card-title">Eliminar Producto</h2>
+          <ul className="admin-list">
+            {productos.map((p) => (
+              <li key={p.id} className="admin-item">
+                <span>{p.nombre}</span>
+                <button className="btn btn-danger" onClick={() => handleEliminar(p.id)}>Eliminar</button>
+              </li>
             ))}
-          </select>
+          </ul>
 
-          <button type="submit">Crear Producto</button>
-        </form>
+          <button className="btn btn-secondary" onClick={() => navigate("/")}>Volver al inicio</button>
+        </div>
 
-        {mensaje && (
-          <p style={{ textAlign: "center", color: mensaje.includes("Error") ? "red" : "green" }}>
-            {mensaje}
-          </p>
-        )}
-
-        <h3>Productos existentes</h3>
-        <ul>
-          {productos.map(p => (
-            <li key={p.id}>{p.nombre} - ${p.precio}</li>
-          ))}
-        </ul>
       </div>
     </div>
   );
