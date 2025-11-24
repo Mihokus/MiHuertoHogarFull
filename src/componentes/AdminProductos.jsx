@@ -108,7 +108,7 @@ function AdminProductos() {
       <div className="admin-container">
 
 
-        {/* CREAR PRODUCTO */}
+      
         <div className="admin-card">
           <h2 className="admin-card-title">Agregar Producto</h2>
           <form onSubmit={handleCrear} className="admin-form">
@@ -147,7 +147,7 @@ function AdminProductos() {
 
 
 
-        {/* EDITAR PRODUCTO */}
+
         <div className="admin-card">
           <h2 className="admin-card-title">Editar Producto</h2>
 
@@ -176,7 +176,7 @@ function AdminProductos() {
 
 
 
-        {/* ELIMINAR PRODUCTO */}
+      
         <div className="admin-card">
           <h2 className="admin-card-title">Eliminar Producto</h2>
           <ul className="admin-list">
