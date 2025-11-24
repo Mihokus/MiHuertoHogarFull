@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 function Header() {
   const navigate = useNavigate();
- 
-  const [usuario, setUsuario] = useState(null); 
+  const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
     const usuarioLogueado = localStorage.getItem('usuarioLogueado');
@@ -15,46 +14,40 @@ function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem('usuarioLogueado');
+    localStorage.removeItem('token');
     setUsuario(null);
-    navigate('/'); 
+    navigate('/');
   };
+
+  // Aquí verificamos si el usuario tiene el rol ADMIN o ROLE_ADMIN
+  const esAdmin = usuario?.roles?.some(r => r === 'ADMIN' || r === 'ROLE_ADMIN');
 
   return (
     <header>
       <h1>HuertoHogar</h1>
       <nav>
-        <ul className="menuizq">
-          <li className="categoria">
-            Categorías
-            <ul className="submenu">
-              <li>Frutas frescas</li>
-              <li>Verduras organicas</li>
-              <li>Productos organicos</li>
-              <li>Productos lacteos</li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-      <form className="busqueda">
-        <input type="text" placeholder="Buscar productos" />
-        <button type="submit">lupa</button>
-      </form>
-      <nav>
         <ul className="menuder">
           <li><Link to="/">Inicio</Link></li>
-          <li><Link to="/catalogo">Catalogo</Link></li>
-          <li>Carrito</li>
-          <li>Perfil</li>
+          <li><Link to="/catalogo">Catálogo</Link></li>
+          <li><Link to="/carrito">Carrito</Link></li>
           <li><Link to="/blog">Blog</Link></li>
-          <li>Reseñas</li>
+
+          {esAdmin && (
+            <li>
+              <button onClick={() => navigate('/admin/productos')}>
+                Admin Productos
+              </button>
+            </li>
+          )}
+
           <li id="cuenta">
             {usuario ? (
               <>
-                <span style={{ marginRight: '10px' }}>{usuario.email}</span>
+                <span style={{ marginRight: '10px' }}>{usuario.nombre}</span>
                 <button onClick={handleLogout}>Cerrar sesión</button>
               </>
             ) : (
-              <button onClick={() => navigate('/login')}>Ingresar Cuenta</button>
+              <button onClick={() => navigate('/login')}>Iniciar sesión</button>
             )}
           </li>
         </ul>

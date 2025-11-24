@@ -2,46 +2,56 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AuthService from "../services/AuthService";
 
-function Login() {
+function Registro() {
   const navigate = useNavigate();
+  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     try {
-      const response = await AuthService.login(email, password);
+      const response = await AuthService.register(nombre, email, password);
 
       if (response && response.token) {
-        // Guardar token y usuario con roles
         localStorage.setItem("token", response.token);
         localStorage.setItem(
           "usuarioLogueado",
           JSON.stringify({
             nombre: response.nombre,
             email: response.email,
-            roles: response.roles, // roles ahora es lista
+            roles: response.roles,
           })
         );
 
-        navigate("/"); // redirige al inicio
-      } else {
-        setError("Credenciales incorrectas.");
+        setSuccess("¡Registro exitoso! Redirigiendo...");
+        setTimeout(() => navigate("/"), 1000);
       }
     } catch (err) {
-      setError("Usuario o contraseña incorrectos.");
+      setError("El correo ya está registrado o hubo un error.");
       console.log(err);
     }
   };
 
   return (
     <div id="forms-container">
-      <div id="login-form">
-        <h2>Iniciar Sesión</h2>
-        <form onSubmit={handleLogin}>
+      <div id="register-form">
+        <h2>Crear Cuenta</h2>
+        <form onSubmit={handleRegister}>
+          <label>Nombre completo</label>
+          <input
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            placeholder="Ingresa tu nombre"
+            required
+          />
+
           <label>Correo electrónico</label>
           <input
             type="email"
@@ -60,21 +70,18 @@ function Login() {
             required
           />
 
-          {error && (
-            <p style={{ color: "red", textAlign: "center", marginBottom: "10px" }}>
-              {error}
-            </p>
-          )}
+          {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+          {success && <p style={{ color: "green", textAlign: "center" }}>{success}</p>}
 
-          <button type="submit">Entrar</button>
+          <button type="submit">Registrarse</button>
         </form>
 
         <p style={{ textAlign: "center", marginTop: "15px" }}>
-          ¿No tienes cuenta? <Link to="/registro">Regístrate</Link>
+          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
         </p>
       </div>
     </div>
   );
 }
 
-export default Login;
+export default Registro;
