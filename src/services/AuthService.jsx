@@ -18,7 +18,14 @@ class AuthService {
   async register(nombre, email, password) {
     const response = await axios.post(`${API_URL}/register`, { nombre, email, password });
 
-  
+    // Si el backend devuelve token al crear usuario, lo guardamos
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data));
+      return response.data;
+    }
+
+    // Si no lo devuelve, lo logueamos automáticamente
     return await this.login(email, password);
   }
 

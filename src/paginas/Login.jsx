@@ -5,7 +5,7 @@ import { UserContext } from "../context/UserContext";
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useContext(UserContext);
+  const { setUsuario } = useContext(UserContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,15 +19,13 @@ function Login() {
       const response = await AuthService.login(email, password);
 
       if (response?.token) {
-        
-        login(
-          {
-            nombre: response.nombre,
-            email: response.email,
-            roles: response.roles
-          },
-          response.token
-        );
+     
+        setUsuario({
+          id: response.id,
+          nombre: response.nombre,
+          email: response.email,
+          roles: response.roles
+        });
 
         navigate("/");
       } else {
@@ -59,13 +57,16 @@ function Login() {
             required
           />
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && <p style={{ color: "red", fontWeight: "bold" }}>{error}</p>}
 
           <button type="submit">Entrar</button>
         </form>
 
         <p>
-          ¿No tienes cuenta? <Link to="/registro">Regístrate</Link>
+          ¿No tienes cuenta?{" "}
+          <Link to="/registro" style={{ color: "#38761D", fontWeight: "bold" }}>
+            Regístrate aquí
+          </Link>
         </p>
       </div>
     </div>

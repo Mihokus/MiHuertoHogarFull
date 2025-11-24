@@ -18,8 +18,15 @@ function Registro() {
 
     try {
       const data = await AuthService.register(nombre, email, password);
-      setUsuario(data);
-      navigate("/");   
+
+      setUsuario({
+        nombre: data.nombre,
+        email: data.email,
+        roles: data.roles
+      });
+
+      navigate("/");
+
     } catch (err) {
       setError(err.response?.data?.message || "⚠ Error al registrarse");
     }
