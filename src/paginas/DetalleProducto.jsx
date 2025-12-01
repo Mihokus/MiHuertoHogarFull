@@ -13,7 +13,7 @@ function DetalleProducto() {
   useEffect(() => {
     const obtenerProducto = async () => {
       try {
-        const res = await axios.get("http://localhost:8081/productos");
+        const res = await axios.get("http://localhost:8082/productos");
         const encontrado = res.data.find((p) => p.codigo === codigo);
         setProducto(encontrado || null);
       } catch (err) {

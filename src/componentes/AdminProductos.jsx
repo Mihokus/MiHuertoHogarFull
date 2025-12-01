@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../api/Api"; 
 import { useNavigate } from "react-router-dom";
 
 function AdminProductos() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+
 
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
@@ -22,27 +22,22 @@ function AdminProductos() {
 
   const [formEditar, setFormEditar] = useState(null);
 
-
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+  
+    
+    API.get("/productos")
+      .then(res => setProductos(res.data))
+      .catch((err) => {
+        console.error(err);
+  
+        if (err.response?.status === 401) navigate("/login");
+      });
 
-    axios.get("http://localhost:8081/productos", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => setProductos(res.data))
-    .catch(() => navigate("/login"));
+    API.get("/categorias")
+      .then(res => setCategorias(res.data))
+      .catch((err) => console.error(err));
 
-    axios.get("http://localhost:8081/categorias", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => setCategorias(res.data))
-    .catch(() => navigate("/login"));
-
-  }, [token, navigate]);
-
+  }, [navigate]);
 
   const handleCrearInput = (e) => {
     setFormCrear({ ...formCrear, [e.target.name]: e.target.value });
@@ -50,25 +45,19 @@ function AdminProductos() {
 
   const handleCrear = async (e) => {
     e.preventDefault();
-
-    const response = await axios.post("http://localhost:8081/productos", formCrear, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setProductos([...productos, response.data]);
-
-    setFormCrear({
-      codigo: "",
-      nombre: "",
-      precio: "",
-      stock: "",
-      unidad: "",
-      descripcion: "",
-      imagenUrl: "",
-      categoriaId: ""
-    });
+    try {
+      const response = await API.post("/productos", formCrear);
+      setProductos([...productos, response.data]);
+      
+      
+      setFormCrear({
+        codigo: "", nombre: "", precio: "", stock: "", 
+        unidad: "", descripcion: "", imagenUrl: "", categoriaId: ""
+      });
+    } catch (error) {
+      console.error("Error al crear:", error);
+    }
   };
-
 
   const seleccionarParaEditar = (producto) => {
     setFormEditar(producto);
@@ -79,40 +68,34 @@ function AdminProductos() {
   };
 
   const handleEditar = async () => {
-    const response = await axios.put(
-      `http://localhost:8081/productos/${formEditar.id}`,
-      formEditar,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    setProductos(productos.map(p => p.id === formEditar.id ? response.data : p));
-    setFormEditar(null);
+    try {
+      const response = await API.put(`/productos/${formEditar.id}`, formEditar);
+      setProductos(productos.map(p => p.id === formEditar.id ? response.data : p));
+      setFormEditar(null);
+    } catch (error) {
+      console.error("Error al editar:", error);
+    }
   };
-
 
   const handleEliminar = async (id) => {
     if (!window.confirm("¿Eliminar producto?")) return;
-
-    await axios.delete(`http://localhost:8081/productos/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setProductos(productos.filter(p => p.id !== id));
+    try {
+      await API.delete(`/productos/${id}`);
+      setProductos(productos.filter(p => p.id !== id));
+    } catch (error) {
+      console.error("Error al eliminar:", error);
+    }
   };
-
 
   return (
     <div className="admin-wrapper">
       <h1 className="admin-title">Panel de Productos</h1>
-
       <div className="admin-container">
-
-
       
+       
         <div className="admin-card">
           <h2 className="admin-card-title">Agregar Producto</h2>
           <form onSubmit={handleCrear} className="admin-form">
-
             {Object.keys(formCrear).map((key) =>
               key !== "categoriaId" ? (
                 <input
@@ -125,7 +108,6 @@ function AdminProductos() {
                 />
               ) : null
             )}
-
             <select
               name="categoriaId"
               value={formCrear.categoriaId}
@@ -135,22 +117,16 @@ function AdminProductos() {
             >
               <option value="">Seleccionar Categoría</option>
               {categorias.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre}
-                </option>
+                <option key={c.id} value={c.id}>{c.nombre}</option>
               ))}
             </select>
-
             <button className="btn btn-primary" type="submit">Guardar</button>
           </form>
         </div>
 
-
-
-
+       
         <div className="admin-card">
           <h2 className="admin-card-title">Editar Producto</h2>
-
           {formEditar === null ? (
             <ul className="admin-list">
               {productos.map((p) => (
@@ -163,20 +139,16 @@ function AdminProductos() {
           ) : (
             <>
               <h3 className="admin-edit-label">Editando: {formEditar.nombre}</h3>
-
               <input name="nombre" value={formEditar.nombre} onChange={handleEditarInput} className="admin-input" />
               <input name="precio" value={formEditar.precio} onChange={handleEditarInput} className="admin-input" />
               <input name="stock" value={formEditar.stock} onChange={handleEditarInput} className="admin-input" />
-
               <button className="btn btn-primary" onClick={handleEditar}>Actualizar</button>
               <button className="btn btn-cancel" onClick={() => setFormEditar(null)}>Cancelar</button>
             </>
           )}
         </div>
 
-
-
-      
+       
         <div className="admin-card">
           <h2 className="admin-card-title">Eliminar Producto</h2>
           <ul className="admin-list">
@@ -187,7 +159,6 @@ function AdminProductos() {
               </li>
             ))}
           </ul>
-
           <button className="btn btn-secondary" onClick={() => navigate("/")}>Volver al inicio</button>
         </div>
 

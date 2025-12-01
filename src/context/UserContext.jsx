@@ -9,10 +9,14 @@ export function UserProvider({ children }) {
     const storedUser = AuthService.getCurrentUser();
     if (storedUser) setUsuario(storedUser);
   }, []);
-  const login = (user, token) => {
-    AuthService.login(user.email, user.password);
-    setUsuario(user);
-  };
+
+ const login = async (email, password) => {
+  const data = await AuthService.login(email, password);
+  if (data.usuario) {
+    setUsuario(data.usuario);
+  }
+};
+
   const logout = () => {
     AuthService.logout();
     setUsuario(null);

@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import API from "../api/Api";
 
 export const CarritoContext = createContext();
+const CARRIOTS_URL = { baseURL: "http://localhost:8083" };
 
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState({ items: [] });
@@ -18,10 +19,10 @@ export const CarritoProvider = ({ children }) => {
 
   const cargarCarritoServidor = async () => {
     try {
-      const res = await API.get("/carrito");
+      const res = await API.get("/carrito",CARRIOTS_URL);
       setCarrito(res.data);
     } catch (e) {
-      console.error("❌ Error cargando carrito del servidor:", e);
+      console.error("Error cargando carrito del servidor:", e);
     }
   };
 

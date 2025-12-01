@@ -28,7 +28,7 @@ function Registro() {
       navigate("/");
 
     } catch (err) {
-      setError(err.response?.data?.message || "⚠ Error al registrarse");
+      setError(err.response?.data?.message || "Error al registrarse");
     }
   };
 
