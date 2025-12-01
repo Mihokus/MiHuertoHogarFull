@@ -1,16 +1,9 @@
-
-
 import axios from "axios";
 
-
+// CORRECCIÓN: Apuntar al Gateway (Puerto 8080)
 const API = axios.create({
-  baseURL: "http://localhost:8082", 
+  baseURL: "http://localhost:8080", 
 });
-
-const AUTH_URL = "http://localhost:8081/auth";
-let isRefreshing = false;
-let failedQueue = [];
-
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");

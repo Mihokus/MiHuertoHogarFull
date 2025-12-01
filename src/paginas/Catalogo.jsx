@@ -15,7 +15,7 @@ function Catalogo() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:8082/categorias")
+    axios.get("http://localhost:8080/categorias")
       .then(res => setCategorias(res.data))
       .catch(err => console.error("Error cargando categorías:", err));
   }, []);
@@ -24,8 +24,8 @@ function Catalogo() {
     const fetchProductos = async () => {
       try {
         const url = categoriaSeleccionada
-          ? `http://localhost:8082/productos?categoriaId=${categoriaSeleccionada}`
-          : `http://localhost:8082/productos`;
+          ? `http://localhost:8080/productos?categoriaId=${categoriaSeleccionada}`
+          : `http://localhost:8080/productos`;
 
         const res = await axios.get(url);
 

@@ -10,7 +10,7 @@ function Inicio() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const res = await axios.get("http://localhost:8082/productos");
+        const res = await axios.get("http://localhost:8080/productos");
         const productos = res.data;
 
         

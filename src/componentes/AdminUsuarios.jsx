@@ -45,7 +45,7 @@ function AdminUsuarios() {
   const eliminarUsuario = async (id) => {
     if (!window.confirm("¿Seguro que deseas eliminar este usuario?")) return;
 
-    await axios.delete(`http://localhost:8081/usuarios/${id}`, {
+    await axios.delete(`http://localhost:8080/usuarios/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

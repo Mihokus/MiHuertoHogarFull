@@ -2,7 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import API from "../api/Api";
 
 export const CarritoContext = createContext();
-const CARRIOTS_URL = { baseURL: "http://localhost:8083" };
+const CARRIOTS_URL = { baseURL: "http://localhost:8080" };
 
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState({ items: [] });

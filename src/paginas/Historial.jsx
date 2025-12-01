@@ -7,7 +7,7 @@ function Historial() {
   useEffect(() => {
     const cargarHistorial = async () => {
       try {
-        const res = await API.get("/carrito/historial",{ baseURL: "http://localhost:8083" });
+        const res = await API.get("/carrito/historial",{ baseURL: "http://localhost:8080" });
         console.log(" Historial recibido:", res.data);
         setPedidos(res.data);
       } catch (err) {
