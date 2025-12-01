@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Footer from '../componentes/Footer';
 import Informacion from '../componentes/Informacion';
 import Producto from '../componentes/Producto';
-import axios from "axios";
+import API from "../api/Api";
 
 function Inicio() {
   const [destacados, setDestacados] = useState([]);
@@ -10,7 +10,7 @@ function Inicio() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/productos");
+        const res = await API.get("/productos");
         const productos = res.data;
 
         

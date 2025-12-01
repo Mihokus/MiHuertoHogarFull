@@ -1,11 +1,9 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:8080/auth";
+import API from "../api/Api";
 
 class AuthService {
 
   async login(email, password) {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
+    const response = await API.post(`/auth/login`, { email, password });
 
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
@@ -16,15 +14,12 @@ class AuthService {
   }
 
   async register(nombre, email, password) {
-    const response = await axios.post(`${API_URL}/register`, { nombre, email, password });
-
+    const response = await API.post(`/auth/register`, { nombre, email, password });
 
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("usuario", JSON.stringify(response.data));
-      return response.data;
+      localStorage.setItem("usuario", JSON.stringify(response.data)); 
     }
-
 
     return await this.login(email, password);
   }

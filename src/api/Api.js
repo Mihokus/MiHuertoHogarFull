@@ -1,8 +1,7 @@
 import axios from "axios";
 
-// CORRECCIÓN: Apuntar al Gateway (Puerto 8080)
 const API = axios.create({
-  baseURL: "http://localhost:8080", 
+  baseURL: "http://localhost:8080",
 });
 
 API.interceptors.request.use((config) => {

@@ -1,8 +1,7 @@
 import { createContext, useState, useEffect } from "react";
-import API from "../api/Api";
+import API from "../api/Api"; 
 
 export const CarritoContext = createContext();
-const CARRIOTS_URL = { baseURL: "http://localhost:8080" };
 
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState({ items: [] });
@@ -19,7 +18,8 @@ export const CarritoProvider = ({ children }) => {
 
   const cargarCarritoServidor = async () => {
     try {
-      const res = await API.get("/carrito",CARRIOTS_URL);
+      
+      const res = await API.get("/carrito"); 
       setCarrito(res.data);
     } catch (e) {
       console.error("Error cargando carrito del servidor:", e);
@@ -41,15 +41,16 @@ export const CarritoProvider = ({ children }) => {
  
   const agregarAlCarrito = async (producto, cantidad = 1) => {
     if (usandoBackend) {
+
       const res = await API.post("/carrito/items", {
-        productoId: producto.id,
+        productoId: producto.id ?? producto.codigo,
         cantidad
       });
       setCarrito(res.data);
       return;
     }
 
-   
+
     const existe = carrito.items.find((item) => item.id === producto.id);
 
     let nuevo;
@@ -87,6 +88,7 @@ export const CarritoProvider = ({ children }) => {
 
   const actualizarCantidad = async (productoId, cantidad) => {
     if (usandoBackend) {
+    
       const res = await API.put("/carrito/items", {
         productoId,
         cantidad
@@ -125,6 +127,7 @@ export const CarritoProvider = ({ children }) => {
   
   const vaciarCarrito = async () => {
     if (usandoBackend) {
+
       const res = await API.delete("/carrito");
       setCarrito(res.data);
       return;
@@ -141,10 +144,10 @@ export const CarritoProvider = ({ children }) => {
   };
 
 
-  const cantidadTotal = carrito.items.reduce(
+  const cantidadTotal = carrito.items?.reduce( 
     (total, item) => total + item.cantidad,
     0
-  );
+  ) || 0;
 
   return (
     <CarritoContext.Provider

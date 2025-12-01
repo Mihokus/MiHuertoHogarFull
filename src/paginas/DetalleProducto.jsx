@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import API from "../api/Api";
 import { CarritoContext } from "../context/CarritoContext";
 
 function DetalleProducto() {
@@ -13,7 +13,7 @@ function DetalleProducto() {
   useEffect(() => {
     const obtenerProducto = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/productos");
+        const res = await API.get("/productos");
         const encontrado = res.data.find((p) => p.codigo === codigo);
         setProducto(encontrado || null);
       } catch (err) {

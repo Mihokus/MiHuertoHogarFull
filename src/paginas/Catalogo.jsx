@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import API from "../api/Api";
 import { CarritoContext } from "../context/CarritoContext";
 import { useNavigate } from "react-router-dom";
 
@@ -15,7 +15,7 @@ function Catalogo() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/categorias")
+    API.get("/categorias")
       .then(res => setCategorias(res.data))
       .catch(err => console.error("Error cargando categorías:", err));
   }, []);
@@ -23,11 +23,11 @@ function Catalogo() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const url = categoriaSeleccionada
-          ? `http://localhost:8080/productos?categoriaId=${categoriaSeleccionada}`
-          : `http://localhost:8080/productos`;
-
-        const res = await axios.get(url);
+        const res = await API.get(
+          categoriaSeleccionada
+            ? `/productos?categoriaId=${categoriaSeleccionada}`
+            : `/productos`
+        );
 
         let lista = [...res.data];
 
@@ -55,7 +55,7 @@ function Catalogo() {
       <h2 className="catalogo-title">Catálogo de Productos</h2>
 
       <div className="filtros-container">
-      
+
         <select
           value={categoriaSeleccionada}
           onChange={(e) => setCategoriaSeleccionada(e.target.value)}
@@ -67,7 +67,7 @@ function Catalogo() {
           ))}
         </select>
 
-       
+
         <select
           value={orden}
           onChange={(e) => setOrden(e.target.value)}
@@ -79,7 +79,7 @@ function Catalogo() {
         </select>
       </div>
 
- 
+
       <div className="catalogo-grid">
         {productos.map((prod) => (
           <div key={prod.id} className="producto-card">
