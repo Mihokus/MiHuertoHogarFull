@@ -6,10 +6,10 @@ export const CarritoContext = createContext();
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState({ items: [] });
 
-  // 🔍 Helper: saber si estoy logueado en cada momento
+  
   const usandoBackend = () => !!localStorage.getItem("token");
 
-  // Cargar carrito al montar
+ 
   useEffect(() => {
     if (usandoBackend()) {
       cargarCarritoServidor();
@@ -21,7 +21,7 @@ export const CarritoProvider = ({ children }) => {
   const cargarCarritoServidor = async () => {
     try {
       const res = await API.get("/carrito");
-      // asumo que res.data = { items: [...] }
+      
       setCarrito(res.data);
     } catch (e) {
       console.error("Error cargando carrito del servidor:", e);
@@ -42,7 +42,7 @@ export const CarritoProvider = ({ children }) => {
     if (usandoBackend()) {
       try {
         const res = await API.post("/carrito/items", {
-          productoId: producto.id,   // el backend usa id del producto
+          productoId: producto.id,  
           cantidad,
         });
         setCarrito(res.data);
@@ -52,7 +52,7 @@ export const CarritoProvider = ({ children }) => {
       return;
     }
 
-    // 🧺 Modo local (sin login)
+ 
     const existe = carrito.items.find((item) => item.id === producto.id);
 
     let nuevo;
@@ -92,7 +92,7 @@ export const CarritoProvider = ({ children }) => {
 
     if (usandoBackend()) {
       try {
-        // 👇 asumo endpoint: PUT /carrito/items/{productoId}
+       
         const res = await API.put(`/carrito/items/${productoId}`, { cantidad });
         setCarrito(res.data);
       } catch (error) {
@@ -101,7 +101,7 @@ export const CarritoProvider = ({ children }) => {
       return;
     }
 
-    // 🧺 Modo local
+    
     const nuevo = {
       items: carrito.items.map((i) =>
         i.id === productoId
@@ -116,7 +116,7 @@ export const CarritoProvider = ({ children }) => {
   const eliminarDelCarrito = async (productoId) => {
     if (usandoBackend()) {
       try {
-        // 👇 asumo endpoint: DELETE /carrito/items/{productoId}
+        
         const res = await API.delete(`/carrito/items/${productoId}`);
         setCarrito(res.data);
       } catch (error) {
@@ -125,7 +125,7 @@ export const CarritoProvider = ({ children }) => {
       return;
     }
 
-    // 🧺 Modo local
+    
     const nuevo = {
       items: carrito.items.filter((item) => item.id !== productoId),
     };
