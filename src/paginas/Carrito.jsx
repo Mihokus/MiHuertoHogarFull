@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { CarritoContext } from "../context/CarritoContext";
 import { useNavigate } from "react-router-dom";
 
@@ -9,9 +9,16 @@ function Carrito() {
   const navigate = useNavigate();
   const [mensajeCompra, setMensajeCompra] = useState("");
 
-  const items = carrito.items ?? []; 
+  const items = carrito?.items ?? [];
 
-  const total = items.reduce((sum, item) => sum + (item.subtotal ?? item.precio * item.cantidad), 0);
+  useEffect(() => {
+    console.log("🛒 Items recibidos:", items);
+  }, [items]);
+
+  const total = items.reduce(
+    (sum, item) => sum + (item.subtotal ?? item.precio * item.cantidad),
+    0
+  );
 
   const realizarCompra = async () => {
     const ok = await checkout();
@@ -28,12 +35,14 @@ function Carrito() {
       <h2 style={{ color: "#38761D", marginBottom: "15px" }}>Mi Carrito</h2>
 
       {mensajeCompra && (
-        <p style={{ color: "green", textAlign: "center", fontWeight: "bold" }}>{mensajeCompra}</p>
+        <p style={{ color: "green", textAlign: "center", fontWeight: "bold" }}>
+          {mensajeCompra}
+        </p>
       )}
 
       {items.length === 0 ? (
         <p style={{ textAlign: "center", fontSize: "18px", marginTop: "20px" }}>
-          {mensajeCompra ? "Gracias por su compra" : "Tu carrito está vacío "}
+          {mensajeCompra ? "Gracias por su compra" : "Tu carrito está vacío"}
         </p>
       ) : (
         <>
@@ -41,9 +50,9 @@ function Carrito() {
             <thead>
               <tr style={{ backgroundColor: "#8BC34A", color: "white" }}>
                 <th style={{ padding: "10px" }}>Producto</th>
-                <th style={{ padding: "10px" }}>Precio</th>
+                <th style={{ padding: "10px" }}>Precio Unidad</th>
                 <th style={{ padding: "10px" }}>Cantidad</th>
-                <th style={{ padding: "10px" }}>Total</th>
+                <th style={{ padding: "10px" }}>Subtotal</th>
                 <th style={{ padding: "10px" }}>Acciones</th>
               </tr>
             </thead>
@@ -58,7 +67,9 @@ function Carrito() {
                       type="number"
                       min="1"
                       value={item.cantidad}
-                      onChange={(e) => actualizarCantidad(item.id, parseInt(e.target.value))}
+                      onChange={(e) =>
+                        actualizarCantidad(item.id, parseInt(e.target.value))
+                      }
                       style={{
                         width: "50px",
                         borderRadius: "5px",
@@ -92,9 +103,18 @@ function Carrito() {
             </tbody>
           </table>
 
-          <h3 style={{ marginTop: "20px", textAlign: "right" }}>Total: ${total}</h3>
+          <h3 style={{ marginTop: "20px", textAlign: "right" }}>
+            Total: <strong>${total}</strong>
+          </h3>
 
-          <div style={{ marginTop: "20px", display: "flex", gap: "10px", justifyContent: "center" }}>
+          <div
+            style={{
+              marginTop: "20px",
+              display: "flex",
+              gap: "10px",
+              justifyContent: "center",
+            }}
+          >
             <button
               onClick={vaciarCarrito}
               style={{
